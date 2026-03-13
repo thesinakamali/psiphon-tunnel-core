@@ -180,10 +180,8 @@ func (uconn *UConn) uLoadSession() error {
 			return err
 		}
 		if session.version == VersionTLS12 {
-			// [Psiphon]
-			// Should not attempt to resume a session ticket if the sessionTicketExt is nil.
-			// In upstream uTLS code, this check is skipped in initSessionTicketExt if
-			// skipResumptionOnNilExtension is true.
+			// [Psiphon] Should not attempt to resume a session ticket if the
+			// sessionTicketExt is nil.
 			if uconn.sessionController.sessionTicketExt == nil {
 				return nil
 			}

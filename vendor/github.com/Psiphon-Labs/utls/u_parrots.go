@@ -3040,12 +3040,9 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 	if clientKeySharePrivate != nil {
 		uconn.HandshakeState.State13.KeyShareKeys = clientKeySharePrivate.ToPublic()
 	} else if uconn.HandshakeState.State13.KeyShareKeys == nil {
-		// [Psiphon]
-		// Only initialize KeyShareKeys if not already set. When
+		// [Psiphon] Only initialize KeyShareKeys if not already set. When
 		// BuildHandshakeStateWithoutSession is called before BuildHandshakeState,
-		// the spec is reused and KeyShareExtension data is already populated. The
-		// key generation loop (len(Data) > 1 check) will skip regeneration, so we
-		// must preserve the existing private keys from the first call.
+		// the spec is reused and KeyShareExtension data is already populated.
 		uconn.HandshakeState.State13.KeyShareKeys = &KeySharePrivateKeys{}
 	}
 	uconn.echCtx = ech
@@ -3210,6 +3207,12 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 							// only do this once for the first non-grease curve
 							uconn.HandshakeState.State13.KeyShareKeys.Ecdhe = reusedKey
 							preferredCurveIsSet = true
+						} else {
+							// [Psiphon] Store reused key as fallback for non-preferred curve
+							if uconn.HandshakeState.State13.KeyShareKeys.EcdheFallback == nil {
+								uconn.HandshakeState.State13.KeyShareKeys.EcdheFallback = make(map[CurveID]*ecdh.PrivateKey)
+							}
+							uconn.HandshakeState.State13.KeyShareKeys.EcdheFallback[curveID] = reusedKey
 						}
 						continue
 					}
@@ -3225,6 +3228,14 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 						// only do this once for the first non-grease curve
 						uconn.HandshakeState.State13.KeyShareKeys.Ecdhe = ecdheKey
 						preferredCurveIsSet = true
+					} else {
+						// [Psiphon] Store secondary key shares so the correct
+						// private key is available if the server selects a
+						// non-preferred curve
+						if uconn.HandshakeState.State13.KeyShareKeys.EcdheFallback == nil {
+							uconn.HandshakeState.State13.KeyShareKeys.EcdheFallback = make(map[CurveID]*ecdh.PrivateKey)
+						}
+						uconn.HandshakeState.State13.KeyShareKeys.EcdheFallback[curveID] = ecdheKey
 					}
 				}
 			}
@@ -3423,12 +3434,9 @@ func generateRandomizedSpec(
 			if r.FlipWeightedCoin(id.Weights.KeyShare_Append_RandomGroups) {
 				ks.KeyShares = append(ks.KeyShares, KeyShare{Group: CurveP256})
 			}
-			// [Psiphon]
-			// Always include X25519MLKEM768 key share when the curve is in
+			// [Psiphon] FIX: Always include X25519MLKEM768 key share when the curve is in
 			// supported_curves, because the TLS 1.3 HRR handler does not
-			// support generating hybrid key shares on demand. If the server
-			// selects X25519MLKEM768 and the client didn't send a key share,
-			// HRR will fail with "CurvePreferences includes unsupported curve".
+			// support generating hybrid key shares on demand.
 			if includeMLKEM {
 				ks.KeyShares = append([]KeyShare{{Group: X25519MLKEM768}}, ks.KeyShares...)
 			}
