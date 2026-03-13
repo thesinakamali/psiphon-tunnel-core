@@ -101,6 +101,9 @@ type clientHelloMsg struct {
 
 	// [Psiphon] Seed is used to randomize the marshalled Client Hello.
 	marshalerPRNGSeed *prng.Seed
+
+	// extensions are only populated on the server-side of a handshake
+	extensions []uint16
 }
 
 func (m *clientHelloMsg) marshalMsg(echInner bool) ([]byte, error) {
@@ -376,8 +379,7 @@ func (m *clientHelloMsg) marshalMsg(echInner bool) ([]byte, error) {
 
 func (m *clientHelloMsg) marshal() ([]byte, error) {
 
-	// [Psiphon]
-	// Randomize the Client Hello.
+	// [Psiphon] Randomize the Client Hello.
 	if m.marshalerPRNGSeed != nil {
 		return m.marshalRandomizedNoECH()
 	}
@@ -385,12 +387,10 @@ func (m *clientHelloMsg) marshal() ([]byte, error) {
 	return m.marshalMsg(false)
 }
 
-// [Psiphon]
+// [Psiphon] marshalRandomizedNoECH is a randomized variant of `marshalMsg(false)`.
+// The original Marshal is retained as-is to ease future merging.
 //
-// marshalRandomizedNoECH is a randomized variant of `marshalMsg(false)`. The original Marshal
-// is retained as-is to ease future merging.
-//
-// marshalRandomizedNoECH is idempotent given the same `clientHelloMsg.Seed`.
+// marshalRandomizedNoECH is not changed given the same `clientHelloMsg.Seed`.
 //
 // The offered cipher suites and algorithms are shuffled and truncated. Longer
 // lists are selected with higher probability. Extensions are shuffled.
@@ -854,6 +854,7 @@ func (m *clientHelloMsg) unmarshal(data []byte) bool {
 			return false
 		}
 		seenExts[extension] = true
+		m.extensions = append(m.extensions, extension)
 
 		switch extension {
 		case extensionServerName:
@@ -1046,6 +1047,10 @@ func (m *clientHelloMsg) unmarshal(data []byte) bool {
 				}
 				m.pskBinders = append(m.pskBinders, binder)
 			}
+		case extensionEncryptedClientHello:
+			if !extData.ReadBytes(&m.encryptedClientHello, len(extData)) {
+				return false
+			}
 		default:
 			// Ignore unknown extensions.
 			continue
@@ -1093,6 +1098,8 @@ func (m *clientHelloMsg) clone() *clientHelloMsg {
 		pskBinders:                       slices.Clone(m.pskBinders),
 		quicTransportParameters:          slices.Clone(m.quicTransportParameters),
 		encryptedClientHello:             slices.Clone(m.encryptedClientHello),
+		// [Psiphon] pointer copy; seed is immutable
+		marshalerPRNGSeed: m.marshalerPRNGSeed,
 	}
 }
 
@@ -1385,6 +1392,7 @@ type encryptedExtensionsMsg struct {
 	quicTransportParameters []byte
 	earlyData               bool
 	echRetryConfigs         []byte
+	serverNameAck           bool
 }
 
 func (m *encryptedExtensionsMsg) marshal() ([]byte, error) {
@@ -1420,6 +1428,10 @@ func (m *encryptedExtensionsMsg) marshal() ([]byte, error) {
 					b.AddBytes(m.echRetryConfigs)
 				})
 			}
+			if m.serverNameAck {
+				b.AddUint16(extensionServerName)
+				b.AddUint16(0) // empty extension_data
+			}
 		})
 	})
 
@@ -1436,6 +1448,7 @@ func (m *encryptedExtensionsMsg) unmarshal(data []byte) bool {
 		return false
 	}
 
+	seenExts := make(map[uint16]bool)
 	for !extensions.Empty() {
 		var extension uint16
 		var extData cryptobyte.String
@@ -1443,6 +1456,11 @@ func (m *encryptedExtensionsMsg) unmarshal(data []byte) bool {
 			!extensions.ReadUint16LengthPrefixed(&extData) {
 			return false
 		}
+
+		if seenExts[extension] {
+			return false
+		}
+		seenExts[extension] = true
 
 		switch extension {
 		case extensionALPN:
@@ -1469,6 +1487,11 @@ func (m *encryptedExtensionsMsg) unmarshal(data []byte) bool {
 			if !extData.CopyBytes(m.echRetryConfigs) {
 				return false
 			}
+		case extensionServerName:
+			if len(extData) != 0 {
+				return false
+			}
+			m.serverNameAck = true
 		default:
 			// Ignore unknown extensions.
 			continue
@@ -2164,7 +2187,7 @@ func (m *certificateRequestMsg) unmarshal(data []byte) bool {
 		}
 		sigAndHashLen := uint16(data[0])<<8 | uint16(data[1])
 		data = data[2:]
-		if sigAndHashLen&1 != 0 {
+		if sigAndHashLen&1 != 0 || sigAndHashLen == 0 {
 			return false
 		}
 		if len(data) < int(sigAndHashLen) {

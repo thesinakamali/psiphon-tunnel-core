@@ -37,12 +37,32 @@ github.com/Psiphon-Labs/consistent
 ## explicit
 github.com/Psiphon-Labs/goptlib
 # github.com/Psiphon-Labs/psiphon-tls v0.0.0-20250318183125-2a2fae2db378
-## explicit; go 1.23
+## explicit; go 1.26
 github.com/Psiphon-Labs/psiphon-tls
-github.com/Psiphon-Labs/psiphon-tls/byteorder
 github.com/Psiphon-Labs/psiphon-tls/internal/boring
-github.com/Psiphon-Labs/psiphon-tls/internal/hpke
-github.com/Psiphon-Labs/psiphon-tls/internal/mlkem768
+github.com/Psiphon-Labs/psiphon-tls/internal/boring/sig
+github.com/Psiphon-Labs/psiphon-tls/internal/constanttime
+github.com/Psiphon-Labs/psiphon-tls/internal/entropy
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/aes
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/aes/gcm
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/alias
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/check
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/drbg
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/hkdf
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/hmac
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/sha256
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/sha3
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/sha512
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/subtle
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/tls12
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140/tls13
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140deps/byteorder
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140deps/cpu
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140deps/godebug
+github.com/Psiphon-Labs/psiphon-tls/internal/fips140tls
+github.com/Psiphon-Labs/psiphon-tls/internal/impl
+github.com/Psiphon-Labs/psiphon-tls/internal/sysrand
 # github.com/Psiphon-Labs/quic-go v0.0.0-20250527153145-79fe45fb83b1
 ## explicit; go 1.23
 github.com/Psiphon-Labs/quic-go
@@ -61,16 +81,19 @@ github.com/Psiphon-Labs/quic-go/internal/wire
 github.com/Psiphon-Labs/quic-go/logging
 github.com/Psiphon-Labs/quic-go/quicvarint
 # github.com/Psiphon-Labs/utls v0.0.0-20260129182755-24497d415a8d
-## explicit; go 1.23
+## explicit; go 1.24
 github.com/Psiphon-Labs/utls
-github.com/Psiphon-Labs/utls/byteorder
 github.com/Psiphon-Labs/utls/dicttls
 github.com/Psiphon-Labs/utls/internal/boring
+github.com/Psiphon-Labs/utls/internal/byteorder
+github.com/Psiphon-Labs/utls/internal/fips140tls
 github.com/Psiphon-Labs/utls/internal/helper
+github.com/Psiphon-Labs/utls/internal/hkdf
 github.com/Psiphon-Labs/utls/internal/hpke
-github.com/Psiphon-Labs/utls/internal/mlkem768
 github.com/Psiphon-Labs/utls/internal/quicvarint
 github.com/Psiphon-Labs/utls/internal/quicvarint/protocol
+github.com/Psiphon-Labs/utls/internal/tls12
+github.com/Psiphon-Labs/utls/internal/tls13
 # github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa
 ## explicit; go 1.13
 github.com/alexbrainman/sspi
@@ -104,24 +127,6 @@ github.com/cespare/xxhash
 # github.com/cheekybits/genny v0.0.0-20170328200008-9127e812e1e9
 ## explicit
 github.com/cheekybits/genny/generic
-# github.com/cloudflare/circl v1.6.3
-## explicit; go 1.22.0
-github.com/cloudflare/circl/dh/x25519
-github.com/cloudflare/circl/dh/x448
-github.com/cloudflare/circl/hpke
-github.com/cloudflare/circl/internal/conv
-github.com/cloudflare/circl/internal/sha3
-github.com/cloudflare/circl/kem
-github.com/cloudflare/circl/kem/kyber/kyber768
-github.com/cloudflare/circl/kem/mlkem/mlkem768
-github.com/cloudflare/circl/kem/xwing
-github.com/cloudflare/circl/math/fp25519
-github.com/cloudflare/circl/math/fp448
-github.com/cloudflare/circl/pke/kyber/internal/common
-github.com/cloudflare/circl/pke/kyber/internal/common/params
-github.com/cloudflare/circl/pke/kyber/kyber768
-github.com/cloudflare/circl/pke/kyber/kyber768/internal
-github.com/cloudflare/circl/simd/keccakf1600
 # github.com/cognusion/go-cache-lru v0.0.0-20170419142635-f73e2280ecea
 ## explicit
 github.com/cognusion/go-cache-lru
@@ -537,8 +542,8 @@ go4.org/mem
 # go4.org/netipx v0.0.0-20230824141953-6213f710f925
 ## explicit; go 1.18
 go4.org/netipx
-# golang.org/x/crypto v0.39.0
-## explicit; go 1.23.0
+# golang.org/x/crypto v0.48.0
+## explicit; go 1.24.0
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/blake2s
 golang.org/x/crypto/blowfish
@@ -557,13 +562,13 @@ golang.org/x/crypto/sha3
 # golang.org/x/exp v0.0.0-20240110193028-0dcbfd608b1e
 ## explicit; go 1.20
 golang.org/x/exp/rand
-# golang.org/x/mod v0.25.0
-## explicit; go 1.23.0
+# golang.org/x/mod v0.32.0
+## explicit; go 1.24.0
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.41.0
-## explicit; go 1.23.0
+# golang.org/x/net v0.49.0
+## explicit; go 1.24.0
 golang.org/x/net/bpf
 golang.org/x/net/dns/dnsmessage
 golang.org/x/net/http/httpguts
@@ -582,11 +587,11 @@ golang.org/x/net/nettest
 golang.org/x/net/proxy
 golang.org/x/net/route
 golang.org/x/net/trace
-# golang.org/x/sync v0.15.0
-## explicit; go 1.23.0
+# golang.org/x/sync v0.19.0
+## explicit; go 1.24.0
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.34.0
-## explicit; go 1.23.0
+# golang.org/x/sys v0.42.0
+## explicit; go 1.25.0
 golang.org/x/sys/cpu
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
@@ -594,11 +599,11 @@ golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
 golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/term v0.32.0
-## explicit; go 1.23.0
+# golang.org/x/term v0.40.0
+## explicit; go 1.24.0
 golang.org/x/term
-# golang.org/x/text v0.26.0
-## explicit; go 1.23.0
+# golang.org/x/text v0.34.0
+## explicit; go 1.24.0
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
@@ -606,9 +611,10 @@ golang.org/x/text/unicode/norm
 # golang.org/x/time v0.5.0
 ## explicit; go 1.18
 golang.org/x/time/rate
-# golang.org/x/tools v0.33.0
-## explicit; go 1.23.0
+# golang.org/x/tools v0.41.0
+## explicit; go 1.24.0
 golang.org/x/tools/go/ast/astutil
+golang.org/x/tools/go/ast/edge
 golang.org/x/tools/go/ast/inspector
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/packages
@@ -616,7 +622,6 @@ golang.org/x/tools/go/types/objectpath
 golang.org/x/tools/go/types/typeutil
 golang.org/x/tools/imports
 golang.org/x/tools/internal/aliases
-golang.org/x/tools/internal/astutil/edge
 golang.org/x/tools/internal/event
 golang.org/x/tools/internal/event/core
 golang.org/x/tools/internal/event/keys
