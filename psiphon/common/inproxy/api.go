@@ -359,6 +359,7 @@ type ProxyAnnounceResponse struct {
 	NetworkProtocol             NetworkProtocol           `cbor:"11,keyasint,omitempty"`
 	DestinationAddress          string                    `cbor:"12,keyasint,omitempty"`
 	ClientRegion                string                    `cbor:"15,keyasint,omitempty"`
+	DTLSFingerprint             string                    `cbor:"16,keyasint,omitempty"`
 }
 
 // ClientOfferRequest is an API request sent from a client to a broker,
@@ -394,6 +395,7 @@ type ClientOfferRequest struct {
 	PackedDestinationServerEntry []byte                    `cbor:"9,keyasint,omitempty"`
 	NetworkProtocol              NetworkProtocol           `cbor:"10,keyasint,omitempty"`
 	DestinationAddress           string                    `cbor:"11,keyasint,omitempty"`
+	DTLSFingerprint              string                    `cbor:"13,keyasint,omitempty"`
 }
 
 // TrafficShapingParameters specifies data channel or media stream traffic

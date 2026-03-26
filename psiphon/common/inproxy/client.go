@@ -372,6 +372,7 @@ func dialClientWebRTCConn(
 	// Initialize the WebRTC offer
 
 	doTLSRandomization := config.WebRTCDialCoordinator.DoDTLSRandomization()
+	dtlsFingerprint := config.WebRTCDialCoordinator.DTLSFingerprint()
 	useMediaStreams := config.WebRTCDialCoordinator.UseMediaStreams()
 	trafficShapingParameters := config.WebRTCDialCoordinator.TrafficShapingParameters()
 	clientRootObfuscationSecret := config.WebRTCDialCoordinator.ClientRootObfuscationSecret()
@@ -383,6 +384,7 @@ func dialClientWebRTCConn(
 			WebRTCDialCoordinator:       config.WebRTCDialCoordinator,
 			ClientRootObfuscationSecret: clientRootObfuscationSecret,
 			DoDTLSRandomization:         doTLSRandomization,
+			DTLSFingerprint:             dtlsFingerprint,
 			UseMediaStreams:             useMediaStreams,
 			TrafficShapingParameters:    trafficShapingParameters,
 			ReliableTransport:           config.ReliableTransport,
@@ -437,6 +439,7 @@ func dialClientWebRTCConn(
 			ICECandidateTypes:            SDPMetrics.iceCandidateTypes,
 			ClientRootObfuscationSecret:  clientRootObfuscationSecret,
 			DoDTLSRandomization:          doTLSRandomization,
+			DTLSFingerprint:              dtlsFingerprint,
 			UseMediaStreams:              useMediaStreams,
 			TrafficShapingParameters:     trafficShapingParameters,
 			PackedDestinationServerEntry: config.PackedDestinationServerEntry,

@@ -264,6 +264,10 @@ func (t *testWebRTCDialCoordinator) DoDTLSRandomization() bool {
 	return t.doDTLSRandomization
 }
 
+func (t *testWebRTCDialCoordinator) DTLSFingerprint() string {
+	return ""
+}
+
 func (t *testWebRTCDialCoordinator) UseMediaStreams() bool {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()

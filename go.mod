@@ -9,27 +9,10 @@ toolchain go1.24.12
 
 replace gitlab.com/yawning/obfs4.git => github.com/jmwample/obfs4 v0.0.0-20230725223418-2d2e5b4a16ba
 
-// When this is the main module, github.com/pion/dtls/v2, used by
-// psiphon/common/inproxy via pion/webrtc, is replaced with a fork
-// which adds support for optional DTLS ClientHello randomization.
-// This fork is currently based on https://github.com/pion/dtls v2.2.7.
-//
-// This fork also includes the mingyech/dtls Conjure customizations.
-//
-// In addition, ice/v2 and webrtc/v3 are replaced by forks, based on
-// github.com/pion/ice/v2 v2.3.24 and github.com/pion/webrtc/v3 v3.2.40
-// respectively, containing Psiphon customizations. See comments in
-// psiphon/common/inproxy/newWebRTCConn for details.
-//
-// The following replaces are required only when the build tag
-// PSIPHON_ENABLE_REFRACTION_NETWORKING is specified (dtls/v2 only) or
-// PSIPHON_DISABLE_INPROXY is not specified.
-
-replace github.com/pion/dtls/v2 => ./replace/dtls
-
-replace github.com/pion/ice/v2 => ./replace/ice
-
-replace github.com/pion/webrtc/v3 => ./replace/webrtc
+// Psiphon uses forked pion/ice and pion/webrtc with import paths rewritten
+// to github.com/Psiphon-Labs/pion-ice and github.com/Psiphon-Labs/pion-webrtc.
+// pion/dtls is stock (no fork) -- DTLS randomization is done via hooks.
+// covert-dtls provides the randomization and mimicry implementations.
 
 require (
 	filippo.io/edwards25519 v1.2.0
@@ -40,6 +23,8 @@ require (
 	github.com/Psiphon-Labs/bolt v0.0.0-20200624191537-23cedaef7ad7
 	github.com/Psiphon-Labs/consistent v0.0.0-20240322131436-20aaa4e05737
 	github.com/Psiphon-Labs/goptlib v0.0.0-20200406165125-c0e32a7a3464
+	github.com/Psiphon-Labs/pion-ice/v4 v4.0.0-0.20260326165046-4d5980863e87
+	github.com/Psiphon-Labs/pion-webrtc/v4 v4.0.0-0.20260326165510-7f77f3f96125
 	github.com/Psiphon-Labs/psiphon-tls v0.0.0-20250318183125-2a2fae2db378
 	github.com/Psiphon-Labs/quic-go v0.0.0-20250527153145-79fe45fb83b1
 	github.com/Psiphon-Labs/utls v0.0.0-20260129182755-24497d415a8d
@@ -64,36 +49,35 @@ require (
 	github.com/grafov/m3u8 v0.0.0-20171211212457-6ab8f28ed427
 	github.com/marusama/semaphore v0.0.0-20171214154724-565ffd8e868a
 	github.com/miekg/dns v1.1.56
+	github.com/minio/crc64nvme v1.1.1
 	github.com/mitchellh/panicwrap v0.0.0-20170106182340-fce601fe5557
 	github.com/oschwald/maxminddb-golang v1.12.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/pion/datachannel v1.5.5
-	github.com/pion/dtls/v2 v2.2.7
-	github.com/pion/ice/v2 v2.3.24
-	github.com/pion/interceptor v0.1.25
-	github.com/pion/logging v0.2.2
-	github.com/pion/rtp v1.8.5
-	github.com/pion/sctp v1.8.16
-	github.com/pion/sdp/v3 v3.0.9
-	github.com/pion/stun v0.6.1
-	github.com/pion/transport/v2 v2.2.4
-	github.com/pion/webrtc/v3 v3.2.40
+	github.com/pion/datachannel v1.6.0
+	github.com/pion/interceptor v0.1.44
+	github.com/pion/logging v0.2.4
+	github.com/pion/rtp v1.10.1
+	github.com/pion/sctp v1.9.2
+	github.com/pion/sdp/v3 v3.0.18
+	github.com/pion/stun/v3 v3.1.1
+	github.com/pion/transport/v4 v4.0.1
 	github.com/refraction-networking/conjure v0.7.11-0.20240130155008-c8df96195ab2
 	github.com/refraction-networking/gotapdance v1.7.10
 	github.com/ryanuber/go-glob v0.0.0-20170128012129-256dc444b735
 	github.com/shirou/gopsutil/v4 v4.24.5
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8
 	github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85
+	github.com/theodorsm/covert-dtls v0.0.0-20260325174436-c76b3ceadbca
 	github.com/wader/filtertransport v0.0.0-20200316221534-bdd9e61eee78
 	github.com/wlynxg/anet v0.0.5
-	golang.org/x/crypto v0.39.0
-	golang.org/x/net v0.41.0
-	golang.org/x/sync v0.15.0
-	golang.org/x/sys v0.34.0
-	golang.org/x/term v0.32.0
-	golang.org/x/time v0.5.0
+	golang.org/x/crypto v0.48.0
+	golang.org/x/net v0.50.0
+	golang.org/x/sync v0.19.0
+	golang.org/x/sys v0.41.0
+	golang.org/x/term v0.40.0
+	golang.org/x/time v0.10.0
 	golang.zx2c4.com/wireguard v0.0.0-20230325221338-052af4a8072b
 	golang.zx2c4.com/wireguard/windows v0.5.3
 	google.golang.org/protobuf v1.36.6
@@ -133,15 +117,18 @@ require (
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mdlayher/netlink v1.7.2 // indirect
 	github.com/mdlayher/socket v0.5.0 // indirect
-	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/mroth/weightedrand v1.0.0 // indirect
 	github.com/onsi/ginkgo/v2 v2.12.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
-	github.com/pion/mdns v0.0.12 // indirect
+	github.com/pion/dtls/v2 v2.2.7 // indirect
+	github.com/pion/dtls/v3 v3.1.2 // indirect
+	github.com/pion/mdns/v2 v2.1.0 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
-	github.com/pion/rtcp v1.2.12 // indirect
-	github.com/pion/srtp/v2 v2.0.18 // indirect
-	github.com/pion/turn/v2 v2.1.3 // indirect
+	github.com/pion/rtcp v1.2.16 // indirect
+	github.com/pion/srtp/v3 v3.0.10 // indirect
+	github.com/pion/stun v0.6.1 // indirect
+	github.com/pion/transport/v2 v2.2.3 // indirect
+	github.com/pion/turn/v4 v4.1.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
@@ -165,8 +152,8 @@ require (
 	go4.org/mem v0.0.0-20220726221520-4f986261bf13 // indirect
 	go4.org/netipx v0.0.0-20230824141953-6213f710f925 // indirect
 	golang.org/x/exp v0.0.0-20240110193028-0dcbfd608b1e // indirect
-	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
-	golang.org/x/tools v0.33.0 // indirect
+	golang.org/x/mod v0.32.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/tools v0.41.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

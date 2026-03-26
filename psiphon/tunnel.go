@@ -43,7 +43,6 @@ import (
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/errors"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/fragmentor"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/inproxy"
-	inproxy_dtls "github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/inproxy/dtls"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/obfuscator"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/parameters"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/prng"
@@ -1441,16 +1440,13 @@ func dialConjure(
 		refraction.DeleteCachedConjureRegistration(conjureConfig)
 	}
 
-	dialCtx := ctx
-	if protocol.ConjureTransportUsesDTLS(dialParams.ConjureTransport) {
-		// Conjure doesn't use the DTLS seed scheme, which supports in-proxy
-		// DTLS randomization. But every DTLS dial expects to find a seed
-		// state, so set the no-seed state.
-		dialCtx = inproxy_dtls.SetNoDTLSSeed(ctx)
-	}
+	// Conjure DTLS no longer requires the seed context mechanism since
+	// stock pion/dtls v3 is used (no fork). The seed was only needed by
+	// the forked pion/dtls for in-proxy randomization, which is now
+	// handled via hooks.
 
 	dialConn, err := refraction.DialConjure(
-		dialCtx,
+		ctx,
 		config.EmitRefractionNetworkingLogs,
 		config.GetPsiphonDataDirectory(),
 		NewRefractionNetworkingDialer(dialParams.GetDialConfig()).DialContext,
