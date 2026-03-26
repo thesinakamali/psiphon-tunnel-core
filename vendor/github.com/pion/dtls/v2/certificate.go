@@ -25,8 +25,9 @@ type ClientHelloInfo struct {
 	// TLS_AES_128_GCM_SHA256, TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256).
 	CipherSuites []CipherSuiteID
 
-	// [Psiphon]
-	// Conjure DTLS support, from: https://github.com/mingyech/dtls/commit/a56eccc1
+	// [Psiphon] RandomBytes contains the random bytes from the ClientHello.
+	// Used by Conjure to identify connections by their embedded seed.
+	// WARNING: This is a vendor patch. Running "go mod vendor" will wipe it.
 	RandomBytes [handshake.RandomBytesLength]byte
 }
 

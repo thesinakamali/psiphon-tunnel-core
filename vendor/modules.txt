@@ -36,7 +36,7 @@ github.com/Psiphon-Labs/consistent
 # github.com/Psiphon-Labs/goptlib v0.0.0-20200406165125-c0e32a7a3464
 ## explicit
 github.com/Psiphon-Labs/goptlib
-# github.com/Psiphon-Labs/pion-ice/v4 v4.0.0-0.20260326165046-4d5980863e87 => ../pion-ice
+# github.com/Psiphon-Labs/pion-ice/v4 v4.0.0-0.20260326165046-4d5980863e87
 ## explicit; go 1.24.0
 github.com/Psiphon-Labs/pion-ice/v4
 github.com/Psiphon-Labs/pion-ice/v4/internal/atomic
@@ -44,7 +44,7 @@ github.com/Psiphon-Labs/pion-ice/v4/internal/fakenet
 github.com/Psiphon-Labs/pion-ice/v4/internal/netutil
 github.com/Psiphon-Labs/pion-ice/v4/internal/stun
 github.com/Psiphon-Labs/pion-ice/v4/internal/taskloop
-# github.com/Psiphon-Labs/pion-webrtc/v4 v4.0.0-0.20260326165510-7f77f3f96125 => ../pion-webrtc
+# github.com/Psiphon-Labs/pion-webrtc/v4 v4.0.0-0.20260326165510-7f77f3f96125
 ## explicit; go 1.24.0
 github.com/Psiphon-Labs/pion-webrtc/v4
 github.com/Psiphon-Labs/pion-webrtc/v4/internal/fmtp
@@ -546,7 +546,7 @@ github.com/tailscale/goupnp/ssdp
 # github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85
 ## explicit; go 1.12
 github.com/tailscale/netlink
-# github.com/theodorsm/covert-dtls v0.0.0-20260325174436-c76b3ceadbca => ../covert-dtls
+# github.com/theodorsm/covert-dtls v0.0.0-20260325174436-c76b3ceadbca
 ## explicit; go 1.24.0
 github.com/theodorsm/covert-dtls/pkg/fingerprints
 github.com/theodorsm/covert-dtls/pkg/mimicry
@@ -776,6 +776,3 @@ tailscale.com/version
 tailscale.com/version/distro
 tailscale.com/wgengine/winnet
 # gitlab.com/yawning/obfs4.git => github.com/jmwample/obfs4 v0.0.0-20230725223418-2d2e5b4a16ba
-# github.com/Psiphon-Labs/pion-ice/v4 => ../pion-ice
-# github.com/Psiphon-Labs/pion-webrtc/v4 => ../pion-webrtc
-# github.com/theodorsm/covert-dtls => ../covert-dtls
