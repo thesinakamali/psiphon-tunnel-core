@@ -36,25 +36,27 @@ import (
 	"sync/atomic"
 	"time"
 
+	ice "github.com/Psiphon-Labs/pion-ice/v4"
+	webrtc "github.com/Psiphon-Labs/pion-webrtc/v4"
 	tls "github.com/Psiphon-Labs/psiphon-tls"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/errors"
-	inproxy_dtls "github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/inproxy/dtls"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/prng"
+	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/protocol"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/quic"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/stacktrace"
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/values"
 	quic_go "github.com/Psiphon-Labs/quic-go"
 	"github.com/pion/datachannel"
-	"github.com/pion/dtls/v2"
-	"github.com/pion/ice/v2"
 	"github.com/pion/interceptor"
 	pion_logging "github.com/pion/logging"
 	"github.com/pion/rtp"
 	"github.com/pion/sdp/v3"
-	"github.com/pion/stun"
-	"github.com/pion/transport/v2"
-	"github.com/pion/webrtc/v3"
+	stun "github.com/pion/stun/v3"
+	transport "github.com/pion/transport/v4"
+	"github.com/theodorsm/covert-dtls/pkg/fingerprints"
+	"github.com/theodorsm/covert-dtls/pkg/mimicry"
+	"github.com/theodorsm/covert-dtls/pkg/randomize"
 	"github.com/wlynxg/anet"
 )
 
@@ -73,19 +75,12 @@ const (
 	mediaTrackMaxRTPPayloadLength = mediaTrackMaxUDPPayloadLength - mediaTrackRTPPacketOverhead
 	mediaTrackMaxIDLength         = 256
 
-	// Psiphon uses a fork of github.com/pion/dtls/v2, selected with go mod
-	// replace, which has an idential API apart from dtls.IsPsiphon. If
-	// dtls.IsPsiphon is undefined, the build is not using the fork.
-	//
-	// Limitation: this doesn't check that the vendored code is exactly the
-	// same code as the fork.
-	assertDTLSFork = dtls.IsPsiphon
-
-	// Similarly, check for the fork of github.com/pion/ice/v2.
+	// Psiphon uses forks of github.com/pion/ice and github.com/pion/webrtc
+	// with import paths rewritten to github.com/Psiphon-Labs/pion-ice and
+	// github.com/Psiphon-Labs/pion-webrtc. The IsPsiphon constant verifies
+	// the fork is linked. pion/dtls is now stock (no fork) -- randomization
+	// is done via hooks.
 	assertICEFork = ice.IsPsiphon
-
-	// Note that Psiphon also uses a fork of github.com/pion/webrtc/v3, but it
-	// has an API change which will cause builds to fail when not present.
 )
 
 // webRTCConn is a WebRTC connection between two peers, with a data channel
@@ -167,6 +162,10 @@ type webRTCConfig struct {
 
 	// DoDTLSRandomization indicates whether to perform DTLS randomization.
 	DoDTLSRandomization bool
+
+	// DTLSFingerprint is the selected DTLS fingerprint name. Empty when
+	// no DTLS fingerprinting is configured.
+	DTLSFingerprint string
 
 	// UseMediaStreams indicates whether to use WebRTC media streams to tunnel
 	// traffic. When false, a WebRTC data channel is used to tunnel traffic.
@@ -418,24 +417,16 @@ func newWebRTCConn(
 		"use_media_streams":            config.UseMediaStreams,
 	}).Info("webrtc_obfuscation")
 
-	// Facilitate DTLS Client/ServerHello randomization. The client decides
-	// whether to do DTLS randomization and generates and the proxy receives
-	// ClientRootObfuscationSecret, so the client can orchestrate replay on
-	// both ends of the connection by reusing an obfuscation secret. Derive a
-	// secret specific to DTLS. SetDTLSSeed will futher derive a secure PRNG
-	// seed specific to either the client or proxy end of the connection
-	// (so each peer's randomization will be distinct).
+	// Facilitate DTLS Client/ServerHello randomization using pion/dtls v3
+	// hooks. The client decides the DTLS fingerprint (or randomization mode)
+	// and both sides derive deterministic PRNG seeds from the shared
+	// ClientRootObfuscationSecret so that replay produces the same handshake.
 	//
-	// To avoid forking many pion repos in order to pass the seed through to
-	// the DTLS implementation, SetDTLSSeed attaches the seed to the DTLS
-	// dial context.
-	//
-	// Either SetDTLSSeed or SetNoDTLSSeed should be set for each conn, as the
-	// pion/dtl fork treats no-seed as an error, as a check against the
-	// context value mechanism.
+	// Unlike the old fork-based approach, this uses stock pion/dtls v3 with
+	// ClientHelloMessageHook/ServerHelloMessageHook set via the SettingEngine.
+	// No DTLS fork is needed.
 
-	var dtlsCtx context.Context
-	if config.DoDTLSRandomization {
+	if config.DTLSFingerprint != "" || config.DoDTLSRandomization {
 
 		dtlsObfuscationSecret, err := deriveObfuscationSecret(
 			config.ClientRootObfuscationSecret, "in-proxy-DTLS-seed")
@@ -445,18 +436,26 @@ func newWebRTCConn(
 
 		baseSeed := prng.Seed(dtlsObfuscationSecret)
 
-		dtlsCtx, err = inproxy_dtls.SetDTLSSeed(ctx, &baseSeed, isOffer)
+		// Derive distinct sub-seeds for client hello and server hello,
+		// and for the offer vs answer side so each peer's randomization
+		// is distinct.
+		clientHelloSaltSuffix := "-client-hello-offer"
+		if !isOffer {
+			clientHelloSaltSuffix = "-client-hello-answer"
+		}
+		clientHelloSeed, err := prng.NewSaltedSeed(
+			&baseSeed, "in-proxy-DTLS"+clientHelloSaltSuffix)
+		if err != nil {
+			return nil, nil, nil, errors.Trace(err)
+		}
+		serverHelloSeed, err := prng.NewSaltedSeed(
+			&baseSeed, "in-proxy-DTLS-server-hello")
 		if err != nil {
 			return nil, nil, nil, errors.Trace(err)
 		}
 
-	} else {
-
-		dtlsCtx = inproxy_dtls.SetNoDTLSSeed(ctx)
+		setDTLSHooks(&settingEngine, config.DTLSFingerprint, clientHelloSeed, serverHelloSeed)
 	}
-	settingEngine.SetDTLSConnectContextMaker(func() (context.Context, func()) {
-		return context.WithCancel(dtlsCtx)
-	})
 
 	// Configure traffic shaping, which adds random padding and decoy messages
 	// to data channel message or media track packet flows.
@@ -1619,7 +1618,7 @@ func (conn *webRTCConn) onICEConnectionStateChange(state webrtc.ICEConnectionSta
 	}).Debug("ICE connection state changed")
 }
 
-func (conn *webRTCConn) onICEGatheringStateChange(state webrtc.ICEGathererState) {
+func (conn *webRTCConn) onICEGatheringStateChange(state webrtc.ICEGatheringState) {
 
 	conn.config.Logger.WithTraceFields(common.LogFields{
 		"state": state.String(),
@@ -3250,6 +3249,48 @@ func hasInterfaceForPrivateIPAddress(IP net.IP) bool {
 	return false
 }
 
+// setDTLSHooks configures ClientHello and ServerHello randomization hooks
+// on the pion SettingEngine based on the selected DTLS fingerprint.
+func setDTLSHooks(
+	settingEngine *webrtc.SettingEngine,
+	dtlsFingerprint string,
+	clientHelloSeed *prng.Seed,
+	serverHelloSeed *prng.Seed,
+) {
+	if protocol.DTLSFingerprintIsRandomized(dtlsFingerprint) || dtlsFingerprint == "" {
+		r := &randomize.RandomizedMessageClientHello{
+			Seed:       clientHelloSeed,
+			RandomALPN: true,
+		}
+		settingEngine.SetDTLSClientHelloMessageHook(r.Hook)
+	} else {
+		fpData, ok := getDTLSFingerprintData(dtlsFingerprint)
+		if ok {
+			m := &mimicry.MimickedClientHello{Seed: clientHelloSeed}
+			if err := m.LoadFingerprint(fpData); err == nil {
+				settingEngine.SetDTLSClientHelloMessageHook(m.Hook)
+			}
+		}
+	}
+
+	sh := &randomize.RandomizedMessageServerHello{Seed: serverHelloSeed}
+	settingEngine.SetDTLSServerHelloMessageHook(sh.Hook)
+}
+
+// getDTLSFingerprintData maps Psiphon DTLS fingerprint names to covert-dtls
+// fingerprint hex data. Psiphon fingerprint names are independent of the
+// underlying implementation.
+func getDTLSFingerprintData(dtlsFingerprint string) (fingerprints.ClientHelloFingerprint, bool) {
+	switch dtlsFingerprint {
+	case protocol.DTLS_FINGERPRINT_CHROME_138:
+		return fingerprints.Chrome_linux_138_0_7204_157, true
+	case protocol.DTLS_FINGERPRINT_FIREFOX_148:
+		return fingerprints.Firefox_linux_stable_148_0_2, true
+	default:
+		return "", false
+	}
+}
+
 // pionNetwork implements pion/transport.Net.
 //
 // Via the SettingsEngine, pion is configured to use a pionNetwork instance,
@@ -3485,6 +3526,11 @@ func (p *pionNetwork) InterfaceByName(name string) (*transport.Interface, error)
 
 func (p *pionNetwork) CreateDialer(dialer *net.Dialer) transport.Dialer {
 	return &pionNetworkDialer{pionNetwork: p}
+}
+
+func (p *pionNetwork) CreateListenConfig(listenerConfig *net.ListenConfig) transport.ListenConfig {
+	p.logger.Errorf("unexpected pionNetwork.CreateListenConfig call from %s", stacktrace.GetParentFunctionName())
+	return nil
 }
 
 type pionNetworkDialer struct {

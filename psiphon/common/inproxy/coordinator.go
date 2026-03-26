@@ -262,6 +262,11 @@ type WebRTCDialCoordinator interface {
 	// the value.
 	DoDTLSRandomization() bool
 
+	// DTLSFingerprint returns the selected DTLS fingerprint name. Returns
+	// "" when no DTLS fingerprinting is to be performed, in which case
+	// DoDTLSRandomization may still apply for legacy behavior.
+	DTLSFingerprint() string
+
 	// UseMediaStreams indicates whether to use WebRTC media streams to tunnel
 	// traffic. When false, a WebRTC data channel is used to tunnel traffic.
 	UseMediaStreams() bool

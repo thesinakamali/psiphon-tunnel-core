@@ -1156,6 +1156,7 @@ func (p *Proxy) proxyOneClient(
 			WebRTCDialCoordinator:       webRTCCoordinator,
 			ClientRootObfuscationSecret: announceResponse.ClientRootObfuscationSecret,
 			DoDTLSRandomization:         announceResponse.DoDTLSRandomization,
+			DTLSFingerprint:             announceResponse.DTLSFingerprint,
 			UseMediaStreams:             announceResponse.UseMediaStreams,
 			TrafficShapingParameters:    announceResponse.TrafficShapingParameters,
 
