@@ -102,7 +102,8 @@ type SettingEngine struct {
 	LoggerFactory                             logging.LoggerFactory
 	iceTCPMux                                 ice.TCPMux
 	iceUDPMux                                 ice.UDPMux
-	iceUDPMuxSrflx                            ice.UniversalUDPMux // [Psiphon]
+	// [Psiphon] from https://github.com/pion/webrtc/pull/2298
+	iceUDPMuxSrflx                            ice.UniversalUDPMux
 	iceProxyDialer                            proxy.Dialer
 	iceDisableActiveTCP                       bool
 	iceBindingRequestHandler                  func(m *stun.Message, local, remote ice.Candidate, pair *ice.CandidatePair) bool //nolint:lll
@@ -478,7 +479,8 @@ func (e *SettingEngine) SetICEUDPMux(udpMux ice.UDPMux) {
 	e.iceUDPMux = udpMux
 }
 
-// [Psiphon] SetICEUDPMuxSrflx sets the mux to be used for server reflexive
+// [Psiphon] from https://github.com/pion/webrtc/pull/2298
+// SetICEUDPMuxSrflx sets the mux to be used for server reflexive
 // candidates, enabling multiplexing of STUN requests over a single UDP port.
 func (e *SettingEngine) SetICEUDPMuxSrflx(udpMuxSrflx ice.UniversalUDPMux) {
 	e.iceUDPMuxSrflx = udpMuxSrflx

@@ -126,13 +126,41 @@ func NewUDPMuxDefault(params UDPMuxParams) *UDPMuxDefault { //nolint:cyclop
 	}
 
 	// [Psiphon]
-	// Defer launching connWorker to avoid a data race when used via
-	// NewUniversalUDPMuxDefault: connWorker accesses fields in the
-	// embedding UniversalUDPMuxDefault struct before the assignment
-	// m.UDPMuxDefault = NewUDPMuxDefault(...) completes. The goroutine
-	// is instead launched in NewUniversalUDPMuxDefault after assignment.
-	// This means bare NewUDPMuxDefault won't work standalone, which is
-	// acceptable for Psiphon's use case.
+	//
+	// - Currently, pion/ice code produces the following race condition due to
+	//   NewUDPMuxDefault launching go mux.connWorker() before the caller
+	//   assigns m.UDPMuxDefault = NewUDPMuxDefault(udpMuxParams), while
+	//   connWorker may access fields in the
+	//   UniversalUDPMuxDefault.UDPMuxDefault embedded struct.
+	//
+	// - For Psiphon's use case, the simple workaround is to delay launching
+	//   go mux.connWorker() until after the assignment in
+	//   NewUniversalUDPMuxDefault. This isn't a general purpose fix since it
+	//   means NewUDPMuxDefault by itself won't work.
+	//
+	// - Note that the IsPsiphon flag/check added for
+	//   gatherCandidatesSrflxUDPMux also checks that this fix is in place.
+	//
+	//
+	// ==================
+	// WARNING: DATA RACE
+	// Read at 0x00c000ee28c0 by goroutine 22319:
+	//   github.com/pion/ice/v2.(*UniversalUDPMuxDefault).isXORMappedResponse()
+	//       /pion/ice/v2/udp_mux_universal.go:136 +0x40
+	//   github.com/pion/ice/v2.(*udpConn).ReadFrom()
+	//       /pion/ice/v2/udp_mux_universal.go:122 +0x234
+	//   github.com/pion/ice/v2.(*UDPMuxDefault).connWorker()
+	//       /pion/ice/v2/udp_mux.go:286 +0xd4
+	//   github.com/pion/ice/v2.NewUDPMuxDefault.func2()
+	//       /pion/ice/v2/udp_mux.go:122 +0x34
+	//
+	// Previous write at 0x00c000ee28c0 by goroutine 22315:
+	//   github.com/pion/ice/v2.NewUniversalUDPMuxDefault()
+	//       /pion/ice/v2/udp_mux_universal.go:73 +0x354
+	//   github.com/pion/webrtc/v3.NewICEUniversalUDPMux()
+	//       /pion/webrtc/v3/icemux.go:39 +0x2b4
+	// ==================
+
 	//go mux.connWorker()
 
 	return mux

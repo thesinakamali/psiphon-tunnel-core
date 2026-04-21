@@ -31,7 +31,8 @@ func NewICEUDPMux(logger logging.LeveledLogger, udpConn net.PacketConn) ice.UDPM
 	})
 }
 
-// [Psiphon] NewICEUniversalUDPMux creates a new instance of ice.UniversalUDPMuxDefault,
+// [Psiphon] from https://github.com/pion/webrtc/pull/2298
+// NewICEUniversalUDPMux creates a new instance of ice.UniversalUDPMuxDefault,
 // which supports host, server reflexive, and relayed candidates over a single UDP port.
 func NewICEUniversalUDPMux(
 	logger logging.LeveledLogger,

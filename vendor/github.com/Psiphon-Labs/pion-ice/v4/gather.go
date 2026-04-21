@@ -675,12 +675,14 @@ func (a *Agent) gatherCandidatesSrflxUDPMux(ctx context.Context, urls []*stun.UR
 					continue
 				}
 
-				// [Psiphon]
-				//
-				// GetListenAddresses returns both IPv4 and IPv6 addresses,
-				// but each networkType iteration should use only matching
-				// addresses. Without this filter, we get 2x duplicate STUN
-				// requests and candidates.
+			// [Psiphon]
+			//
+			// - GetListenAddresses returns both IPv4 and IPv6 addresses,
+			//   but this loop iteration should use only one or the other,
+			//   depending on networkType.
+			//
+			// - Without this filter, we get 2x duplicate STUN requests
+			//   and candidates.
 				if networkType.IsIPv4() != (udpAddr.IP.To4() != nil) {
 					continue
 				}
