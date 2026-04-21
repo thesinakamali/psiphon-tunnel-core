@@ -1760,11 +1760,6 @@ func (w *InproxyWebRTCDialInstance) ClientRootObfuscationSecret() inproxy.Obfusc
 }
 
 // Implements the inproxy.WebRTCDialCoordinator interface.
-func (w *InproxyWebRTCDialInstance) DoDTLSRandomization() bool {
-	return w.webRTCDialParameters.DoDTLSRandomization
-}
-
-// Implements the inproxy.WebRTCDialCoordinator interface.
 func (w *InproxyWebRTCDialInstance) DTLSFingerprint() string {
 	return w.webRTCDialParameters.DTLSFingerprint
 }
@@ -2263,7 +2258,6 @@ type InproxyWebRTCDialParameters struct {
 	RootObfuscationSecret    inproxy.ObfuscationSecret
 	UseMediaStreams          bool
 	TrafficShapingParameters *inproxy.TrafficShapingParameters
-	DoDTLSRandomization      bool
 	DTLSFingerprint          string
 }
 
@@ -2299,18 +2293,12 @@ func MakeInproxyWebRTCDialParameters(
 		}
 	}
 
-	doDTLSRandomization := p.WeightedCoinFlip(parameters.InproxyDTLSRandomizationProbability)
-
-	var dtlsFingerprint string
-	if p.WeightedCoinFlip(parameters.InproxyDTLSFingerprintProbability) {
-		dtlsFingerprint = selectDTLSFingerprint(p)
-	}
+	dtlsFingerprint := selectDTLSFingerprint(p)
 
 	return &InproxyWebRTCDialParameters{
 		RootObfuscationSecret:    rootObfuscationSecret,
 		UseMediaStreams:          useMediaStreams,
 		TrafficShapingParameters: trafficSharingParams,
-		DoDTLSRandomization:      dtlsFingerprint != "" || doDTLSRandomization,
 		DTLSFingerprint:          dtlsFingerprint,
 	}, nil
 }
@@ -2319,9 +2307,21 @@ func MakeInproxyWebRTCDialParameters(
 // two-tier pattern as selectTLSProfile: randomized fingerprints are selected
 // with probability InproxyDTLSFingerprintSelectRandomizedProbability, and
 // parrot (mimicry) fingerprints are selected otherwise.
+//
+// Both the client and proxy call selectDTLSFingerprint independently; the
+// proxy is not told which fingerprint the client chose.
+//
+// Limitation: the proxy independently selects its own DTLS fingerprint using
+// its local protocol.SupportedDTLSFingerprints. If a client replays the same
+// ClientRootObfuscationSecret against a different proxy whose
+// SupportedDTLSFingerprints list has been upgraded, downgraded, or
+// reordered, the proxy's fingerprint choice will not be the same as on the
+// original dial, even though the PRNG seed is identical. The client-side
+// fingerprint selection and handshake remain reproducible; only the proxy
+// side diverges.
 func selectDTLSFingerprint(p parameters.ParametersAccessor) string {
 
-	limitFingerprints := p.DTLSFingerprints(parameters.InproxyDTLSFingerprintLimit)
+	limitFingerprints := p.DTLSFingerprints(parameters.InproxyLimitDTLSFingerprints)
 
 	randomizedFingerprints := make([]string, 0)
 	parrotFingerprints := make([]string, 0)
@@ -2358,9 +2358,7 @@ func (dialParams *InproxyWebRTCDialParameters) GetMetrics() common.LogFields {
 
 	logFields := common.LogFields{}
 
-	if dialParams.DTLSFingerprint != "" {
-		logFields["inproxy_webrtc_dtls_fingerprint"] = dialParams.DTLSFingerprint
-	}
+	logFields["inproxy_webrtc_dtls_fingerprint"] = dialParams.DTLSFingerprint
 
 	return logFields
 }

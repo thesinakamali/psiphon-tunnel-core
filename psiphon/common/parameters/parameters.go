@@ -452,10 +452,8 @@ const (
 	InproxyClientRelayedPacketRequestTimeout           = "InproxyClientRelayedPacketRequestTimeout"
 	InproxyClientDSLRequestTimeout                     = "InproxyClientDSLRequestTimeout"
 	InproxyBrokerRoundTripStatusCodeFailureThreshold   = "InproxyBrokerRoundTripStatusCodeFailureThreshold"
-	InproxyDTLSRandomizationProbability                = "InproxyDTLSRandomizationProbability"
-	InproxyDTLSFingerprintProbability                  = "InproxyDTLSFingerprintProbability"
-	InproxyDTLSFingerprintLimitProbability             = "InproxyDTLSFingerprintLimitProbability"
-	InproxyDTLSFingerprintLimit                        = "InproxyDTLSFingerprintLimit"
+	InproxyLimitDTLSFingerprintsProbability             = "InproxyLimitDTLSFingerprintsProbability"
+	InproxyLimitDTLSFingerprints                       = "InproxyLimitDTLSFingerprints"
 	InproxyDTLSFingerprintSelectRandomizedProbability  = "InproxyDTLSFingerprintSelectRandomizedProbability"
 	InproxyWebRTCMediaStreamsProbability               = "InproxyWebRTCMediaStreamsProbability"
 	InproxyWebRTCDataChannelTrafficShapingProbability  = "InproxyWebRTCDataChannelTrafficShapingProbability"
@@ -585,6 +583,8 @@ const (
 	InproxyTunnelProtocolSelectionProbability = "InproxyTunnelProtocolSelectionProbability"
 	ReplayIgnoreChangedConfigState            = "ReplayIgnoreChangedConfigState"
 	DestinationBytesMetricsASN                = "DestinationBytesMetricsASN"
+	InproxyDTLSRandomizationProbability       = "InproxyDTLSRandomizationProbability"
+	InproxyDTLSFingerprintProbability         = "InproxyDTLSFingerprintProbability"
 )
 
 const (
@@ -1103,8 +1103,8 @@ var defaultParameters = map[string]struct {
 	InproxyBrokerRoundTripStatusCodeFailureThreshold:   {value: 2 * time.Second, minimum: time.Duration(0), flags: useNetworkLatencyMultiplier},
 	InproxyDTLSRandomizationProbability:                {value: 0.5, minimum: 0.0},
 	InproxyDTLSFingerprintProbability:                  {value: 0.5, minimum: 0.0},
-	InproxyDTLSFingerprintLimitProbability:             {value: 1.0, minimum: 0.0},
-	InproxyDTLSFingerprintLimit:                        {value: protocol.DTLSFingerprints{}},
+	InproxyLimitDTLSFingerprintsProbability:             {value: 1.0, minimum: 0.0},
+	InproxyLimitDTLSFingerprints:                       {value: protocol.DTLSFingerprints{}},
 	InproxyDTLSFingerprintSelectRandomizedProbability:  {value: 0.25, minimum: 0.0},
 	InproxyWebRTCMediaStreamsProbability:               {value: 0.0, minimum: 0.0},
 	InproxyWebRTCDataChannelTrafficShapingProbability:  {value: 0.5, minimum: 0.0},

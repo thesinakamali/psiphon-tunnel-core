@@ -160,11 +160,10 @@ type webRTCConfig struct {
 	// and sent to the proxy and used to drive obfuscation operations.
 	ClientRootObfuscationSecret ObfuscationSecret
 
-	// DoDTLSRandomization indicates whether to perform DTLS randomization.
-	DoDTLSRandomization bool
-
-	// DTLSFingerprint is the selected DTLS fingerprint name. Empty when
-	// no DTLS fingerprinting is configured.
+	// DTLSFingerprint is the selected DTLS fingerprint name. New clients
+	// always select a fingerprint.
+	//
+	// NOTE: May be empty only for legacy clients.
 	DTLSFingerprint string
 
 	// UseMediaStreams indicates whether to use WebRTC media streams to tunnel
@@ -412,21 +411,25 @@ func newWebRTCConn(
 	// Initialize data channel or media streams obfuscation
 
 	config.Logger.WithTraceFields(common.LogFields{
-		"dtls_randomization":           config.DoDTLSRandomization,
+		"dtls_fingerprint":             config.DTLSFingerprint,
 		"data_channel_traffic_shaping": config.TrafficShapingParameters != nil,
 		"use_media_streams":            config.UseMediaStreams,
 	}).Info("webrtc_obfuscation")
 
-	// Facilitate DTLS Client/ServerHello randomization using pion/dtls v3
-	// hooks. The client decides the DTLS fingerprint (or randomization mode)
-	// and both sides derive deterministic PRNG seeds from the shared
-	// ClientRootObfuscationSecret so that replay produces the same handshake.
+	// Facilitate DTLS Client/ServerHello randomization. The client generates
+	// ClientRootObfuscationSecret, which the proxy receives via the broker,
+	// so the client can orchestrate replay on both ends of the connection by
+	// reusing an obfuscation secret. Derive a secret specific to DTLS.
 	//
-	// Unlike the old fork-based approach, this uses stock pion/dtls v3 with
-	// ClientHelloMessageHook/ServerHelloMessageHook set via the SettingEngine.
-	// No DTLS fork is needed.
+	// Each side independently selects its DTLS fingerprint profile. This
+	// intentional asymmetry produces a circumvention-friendly mix of profiles
+	// across the two peers, while determinism and replay are preserved by
+	// seeding both sides' PRNGs from the shared obfuscation secret.
+	//
+	// Implementation uses stock pion/dtls v3 ClientHelloMessageHook and
+	// ServerHelloMessageHook on the SettingEngine.
 
-	if config.DTLSFingerprint != "" || config.DoDTLSRandomization {
+	if config.DTLSFingerprint != "" {
 
 		dtlsObfuscationSecret, err := deriveObfuscationSecret(
 			config.ClientRootObfuscationSecret, "in-proxy-DTLS-seed")
@@ -1516,12 +1519,6 @@ func (conn *webRTCConn) GetMetrics() common.LogFields {
 	logFields := make(common.LogFields)
 
 	logFields.Add(conn.iceCandidatePairMetrics)
-
-	randomizeDTLS := "0"
-	if conn.config.DoDTLSRandomization {
-		randomizeDTLS = "1"
-	}
-	logFields["inproxy_webrtc_randomize_dtls"] = randomizeDTLS
 
 	useMediaStreams := "0"
 	if conn.config.UseMediaStreams {

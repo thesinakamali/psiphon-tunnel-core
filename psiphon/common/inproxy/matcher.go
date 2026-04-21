@@ -203,7 +203,6 @@ type MatchOffer struct {
 	ClientOfferSDP              WebRTCSessionDescription
 	ClientRootObfuscationSecret ObfuscationSecret
 	DoDTLSRandomization         bool
-	DTLSFingerprint             string
 	UseMediaStreams             bool
 	TrafficShapingParameters    *TrafficShapingParameters
 	NetworkProtocol             NetworkProtocol

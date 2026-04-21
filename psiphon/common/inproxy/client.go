@@ -371,7 +371,6 @@ func dialClientWebRTCConn(
 
 	// Initialize the WebRTC offer
 
-	doTLSRandomization := config.WebRTCDialCoordinator.DoDTLSRandomization()
 	dtlsFingerprint := config.WebRTCDialCoordinator.DTLSFingerprint()
 	useMediaStreams := config.WebRTCDialCoordinator.UseMediaStreams()
 	trafficShapingParameters := config.WebRTCDialCoordinator.TrafficShapingParameters()
@@ -383,7 +382,6 @@ func dialClientWebRTCConn(
 			EnableDebugLogging:          config.EnableWebRTCDebugLogging,
 			WebRTCDialCoordinator:       config.WebRTCDialCoordinator,
 			ClientRootObfuscationSecret: clientRootObfuscationSecret,
-			DoDTLSRandomization:         doTLSRandomization,
 			DTLSFingerprint:             dtlsFingerprint,
 			UseMediaStreams:             useMediaStreams,
 			TrafficShapingParameters:    trafficShapingParameters,
@@ -438,8 +436,13 @@ func dialClientWebRTCConn(
 			ClientOfferSDP:               SDP,
 			ICECandidateTypes:            SDPMetrics.iceCandidateTypes,
 			ClientRootObfuscationSecret:  clientRootObfuscationSecret,
-			DoDTLSRandomization:          doTLSRandomization,
-			DTLSFingerprint:              dtlsFingerprint,
+
+			// Legacy-compat: always signal DoDTLSRandomization so old
+			// proxies running pre-covert-dtls code still randomize their
+			// DTLS handshake. New proxies ignore this field and select
+			// their own fingerprint via selectDTLSFingerprint.
+			DoDTLSRandomization:          true,
+
 			UseMediaStreams:              useMediaStreams,
 			TrafficShapingParameters:     trafficShapingParameters,
 			PackedDestinationServerEntry: config.PackedDestinationServerEntry,
