@@ -11,12 +11,8 @@ replace gitlab.com/yawning/obfs4.git => github.com/jmwample/obfs4 v0.0.0-2023072
 
 replace github.com/pion/dtls/v2 => ./replace/dtls
 
-// Psiphon uses forked pion/ice, pion/webrtc, and covert-dtls with import
-// paths rewritten to github.com/Psiphon-Labs/{pion-ice,pion-webrtc,covert-dtls}.
-// pion/dtls v3 is stock (no fork) -- DTLS randomization is done via hooks.
 // pion/dtls v2 uses a local replace (replace/dtls) with [Psiphon] patches
 // for Conjure/refraction-networking support.
-// covert-dtls provides the randomization and mimicry implementations.
 
 require (
 	filippo.io/edwards25519 v1.2.0
@@ -27,8 +23,8 @@ require (
 	github.com/Psiphon-Labs/bolt v0.0.0-20200624191537-23cedaef7ad7
 	github.com/Psiphon-Labs/consistent v0.0.0-20240322131436-20aaa4e05737
 	github.com/Psiphon-Labs/goptlib v0.0.0-20200406165125-c0e32a7a3464
-	github.com/Psiphon-Labs/pion-ice/v4 v4.0.0-0.20260326165046-4d5980863e87
-	github.com/Psiphon-Labs/pion-webrtc/v4 v4.0.0-0.20260326165510-7f77f3f96125
+	github.com/Psiphon-Labs/pion-ice/v4 v4.0.0-20260421192847-03e3143eac28
+	github.com/Psiphon-Labs/pion-webrtc/v4 v4.0.0-20260421203412-16b9388e71ce
 	github.com/Psiphon-Labs/psiphon-tls v0.0.0-20250318183125-2a2fae2db378
 	github.com/Psiphon-Labs/quic-go v0.0.0-20250527153145-79fe45fb83b1
 	github.com/Psiphon-Labs/utls v0.0.0-20260129182755-24497d415a8d
@@ -73,7 +69,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8
 	github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85
-	github.com/Psiphon-Labs/covert-dtls v0.0.0-20260421161552-9ee857602628
+	github.com/Psiphon-Labs/covert-dtls v0.0.0-20260421192706-c40ece563ae6
 	github.com/wader/filtertransport v0.0.0-20200316221534-bdd9e61eee78
 	github.com/wlynxg/anet v0.0.5
 	golang.org/x/crypto v0.48.0

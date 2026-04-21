@@ -156,8 +156,6 @@ type webRTCConfig struct {
 
 	// DTLSFingerprint is the selected DTLS fingerprint name. New clients
 	// always select a fingerprint.
-	//
-	// NOTE: May be empty only for legacy clients.
 	DTLSFingerprint string
 
 	// UseMediaStreams indicates whether to use WebRTC media streams to tunnel

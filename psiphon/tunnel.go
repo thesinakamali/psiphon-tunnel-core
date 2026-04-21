@@ -1440,11 +1440,6 @@ func dialConjure(
 		refraction.DeleteCachedConjureRegistration(conjureConfig)
 	}
 
-	// Conjure DTLS no longer requires the seed context mechanism since
-	// stock pion/dtls v3 is used (no fork). The seed was only needed by
-	// the forked pion/dtls for in-proxy randomization, which is now
-	// handled via hooks.
-
 	dialConn, err := refraction.DialConjure(
 		ctx,
 		config.EmitRefractionNetworkingLogs,

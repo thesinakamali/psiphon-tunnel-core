@@ -259,8 +259,6 @@ type WebRTCDialCoordinator interface {
 	// DTLSFingerprint returns the selected DTLS fingerprint name. New
 	// clients always select a fingerprint (Randomized, Chrome, Firefox,
 	// etc.).
-	//
-	// NOTE: May return "" only for legacy clients or edge cases.
 	DTLSFingerprint() string
 
 	// UseMediaStreams indicates whether to use WebRTC media streams to tunnel

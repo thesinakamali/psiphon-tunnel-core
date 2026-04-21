@@ -2356,6 +2356,8 @@ func (dialParams *InproxyWebRTCDialParameters) GetMetrics() common.LogFields {
 	// higher level, and, for client in-proxy tunnel dials, is part of the
 	// main tunnel dial parameters.
 
+	// All WebRTC metrics except inproxy_webrtc_dtls_fingerprint are
+	// delivered via inproxy.ClientConn/WebRTCConn GetMetrics.
 	logFields := common.LogFields{}
 
 	logFields["inproxy_webrtc_dtls_fingerprint"] = dialParams.DTLSFingerprint
