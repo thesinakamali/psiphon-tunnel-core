@@ -333,7 +333,7 @@ github.com/pelletier/go-toml
 # github.com/pion/datachannel v1.6.0
 ## explicit; go 1.21
 github.com/pion/datachannel
-# github.com/pion/dtls/v2 v2.2.7
+# github.com/pion/dtls/v2 v2.2.7 => ./replace/dtls
 ## explicit; go 1.13
 github.com/pion/dtls/v2
 github.com/pion/dtls/v2/internal/ciphersuite
@@ -776,3 +776,4 @@ tailscale.com/version
 tailscale.com/version/distro
 tailscale.com/wgengine/winnet
 # gitlab.com/yawning/obfs4.git => github.com/jmwample/obfs4 v0.0.0-20230725223418-2d2e5b4a16ba
+# github.com/pion/dtls/v2 => ./replace/dtls

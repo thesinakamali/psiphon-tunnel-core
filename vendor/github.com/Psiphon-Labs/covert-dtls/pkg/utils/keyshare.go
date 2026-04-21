@@ -98,8 +98,9 @@ func (k *KeyShare) Unmarshal(data []byte) error {
 	}
 
 	length := int(binary.BigEndian.Uint16(data[2:])) + 4 // offset = 2 byte type + 2 byte length
-	// [Psiphon] Fix: use > instead of >= so the extension whose data exactly
-	// consumes all remaining bytes is not rejected.
+	// [Psiphon] Fix boundary check: compare against len(data) instead of
+	// len(data[2:]), and use > instead of >= so the extension whose data
+	// exactly consumes all remaining bytes is not rejected.
 	if length > len(data) {
 		return errLengthMismatch
 	}

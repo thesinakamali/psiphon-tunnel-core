@@ -26,8 +26,9 @@ func (f *FakeExt) Unmarshal(data []byte) error {
 	f.FakeTypeValue = extension.TypeValue(binary.BigEndian.Uint16(data))
 
 	length := int(binary.BigEndian.Uint16(data[2:])) + 4 // offset = 2 byte type + 2 byte length
-	// [Psiphon] Fix: use > instead of >= so the last extension in a buffer
-	// (where length exactly equals remaining data) is not rejected.
+	// [Psiphon] Fix boundary check: compare against len(data) instead of
+	// len(data[2:]), and use > instead of >= so the last extension in a
+	// buffer (where length exactly equals remaining data) is not rejected.
 	if length > len(data) {
 		return errLengthMismatch
 	}

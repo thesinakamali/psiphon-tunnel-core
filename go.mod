@@ -4,14 +4,18 @@ go 1.24.0
 
 toolchain go1.24.12
 
-// The following replace is required only when the build tag
+// The following replaces are required only when the build tag
 // PSIPHON_ENABLE_REFRACTION_NETWORKING is specified.
 
 replace gitlab.com/yawning/obfs4.git => github.com/jmwample/obfs4 v0.0.0-20230725223418-2d2e5b4a16ba
 
+replace github.com/pion/dtls/v2 => ./replace/dtls
+
 // Psiphon uses forked pion/ice, pion/webrtc, and covert-dtls with import
 // paths rewritten to github.com/Psiphon-Labs/{pion-ice,pion-webrtc,covert-dtls}.
-// pion/dtls is stock (no fork) -- DTLS randomization is done via hooks.
+// pion/dtls v3 is stock (no fork) -- DTLS randomization is done via hooks.
+// pion/dtls v2 uses a local replace (replace/dtls) with [Psiphon] patches
+// for Conjure/refraction-networking support.
 // covert-dtls provides the randomization and mimicry implementations.
 
 require (
