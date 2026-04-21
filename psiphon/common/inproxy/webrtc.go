@@ -75,12 +75,6 @@ const (
 	mediaTrackMaxRTPPayloadLength = mediaTrackMaxUDPPayloadLength - mediaTrackRTPPacketOverhead
 	mediaTrackMaxIDLength         = 256
 
-	// Psiphon uses forks of github.com/pion/ice and github.com/pion/webrtc
-	// with import paths rewritten to github.com/Psiphon-Labs/pion-ice and
-	// github.com/Psiphon-Labs/pion-webrtc. The IsPsiphon constant verifies
-	// the fork is linked. pion/dtls is now stock (no fork) -- randomization
-	// is done via hooks.
-	assertICEFork = ice.IsPsiphon
 )
 
 // webRTCConn is a WebRTC connection between two peers, with a data channel
