@@ -8,8 +8,8 @@ import (
 	"github.com/pion/dtls/v3/pkg/protocol"
 	"github.com/pion/dtls/v3/pkg/protocol/extension"
 	"github.com/pion/dtls/v3/pkg/protocol/handshake"
-	"github.com/theodorsm/covert-dtls/pkg/fingerprints"
-	"github.com/theodorsm/covert-dtls/pkg/utils"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/fingerprints"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/utils"
 )
 
 const handshakeMessageClientHelloVariableWidthStart = 34

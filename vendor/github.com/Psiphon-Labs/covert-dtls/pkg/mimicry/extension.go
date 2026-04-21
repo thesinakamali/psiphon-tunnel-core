@@ -3,7 +3,7 @@ package mimicry
 import (
 	"encoding/binary"
 	"github.com/pion/dtls/v3/pkg/protocol/extension"
-	"github.com/theodorsm/covert-dtls/pkg/utils"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/utils"
 )
 
 // Unmarshal many extensions at once.

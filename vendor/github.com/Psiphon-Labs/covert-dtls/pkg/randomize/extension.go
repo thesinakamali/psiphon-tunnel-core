@@ -8,7 +8,7 @@ import (
 	"github.com/pion/dtls/v3/pkg/crypto/signature"
 	"github.com/pion/dtls/v3/pkg/crypto/signaturehash"
 	"github.com/pion/dtls/v3/pkg/protocol/extension"
-	"github.com/theodorsm/covert-dtls/pkg/utils"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/utils"
 )
 
 // [Psiphon] ecdsaP256SHA256 is the signature algorithm that must be preserved

@@ -54,9 +54,9 @@ import (
 	"github.com/pion/sdp/v3"
 	stun "github.com/pion/stun/v3"
 	transport "github.com/pion/transport/v4"
-	"github.com/theodorsm/covert-dtls/pkg/fingerprints"
-	"github.com/theodorsm/covert-dtls/pkg/mimicry"
-	"github.com/theodorsm/covert-dtls/pkg/randomize"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/fingerprints"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/mimicry"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/randomize"
 	"github.com/wlynxg/anet"
 )
 

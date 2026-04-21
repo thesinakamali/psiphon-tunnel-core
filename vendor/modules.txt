@@ -33,6 +33,12 @@ github.com/Psiphon-Labs/bolt
 # github.com/Psiphon-Labs/consistent v0.0.0-20240322131436-20aaa4e05737
 ## explicit; go 1.9
 github.com/Psiphon-Labs/consistent
+# github.com/Psiphon-Labs/covert-dtls v0.0.0-20260421161552-9ee857602628
+## explicit; go 1.24.0
+github.com/Psiphon-Labs/covert-dtls/pkg/fingerprints
+github.com/Psiphon-Labs/covert-dtls/pkg/mimicry
+github.com/Psiphon-Labs/covert-dtls/pkg/randomize
+github.com/Psiphon-Labs/covert-dtls/pkg/utils
 # github.com/Psiphon-Labs/goptlib v0.0.0-20200406165125-c0e32a7a3464
 ## explicit
 github.com/Psiphon-Labs/goptlib
@@ -546,12 +552,6 @@ github.com/tailscale/goupnp/ssdp
 # github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85
 ## explicit; go 1.12
 github.com/tailscale/netlink
-# github.com/theodorsm/covert-dtls v0.0.0-20260325174436-c76b3ceadbca
-## explicit; go 1.24.0
-github.com/theodorsm/covert-dtls/pkg/fingerprints
-github.com/theodorsm/covert-dtls/pkg/mimicry
-github.com/theodorsm/covert-dtls/pkg/randomize
-github.com/theodorsm/covert-dtls/pkg/utils
 # github.com/tklauser/go-sysconf v0.3.12
 ## explicit; go 1.13
 github.com/tklauser/go-sysconf

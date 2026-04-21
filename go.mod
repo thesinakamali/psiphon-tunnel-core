@@ -9,8 +9,8 @@ toolchain go1.24.12
 
 replace gitlab.com/yawning/obfs4.git => github.com/jmwample/obfs4 v0.0.0-20230725223418-2d2e5b4a16ba
 
-// Psiphon uses forked pion/ice and pion/webrtc with import paths rewritten
-// to github.com/Psiphon-Labs/pion-ice and github.com/Psiphon-Labs/pion-webrtc.
+// Psiphon uses forked pion/ice, pion/webrtc, and covert-dtls with import
+// paths rewritten to github.com/Psiphon-Labs/{pion-ice,pion-webrtc,covert-dtls}.
 // pion/dtls is stock (no fork) -- DTLS randomization is done via hooks.
 // covert-dtls provides the randomization and mimicry implementations.
 
@@ -69,7 +69,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8
 	github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85
-	github.com/theodorsm/covert-dtls v0.0.0-20260325174436-c76b3ceadbca
+	github.com/Psiphon-Labs/covert-dtls v0.0.0-20260421161552-9ee857602628
 	github.com/wader/filtertransport v0.0.0-20200316221534-bdd9e61eee78
 	github.com/wlynxg/anet v0.0.5
 	golang.org/x/crypto v0.48.0

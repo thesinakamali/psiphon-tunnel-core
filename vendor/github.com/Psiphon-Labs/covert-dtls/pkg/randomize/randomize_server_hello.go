@@ -3,7 +3,7 @@ package randomize
 import (
 	"github.com/Psiphon-Labs/psiphon-tunnel-core/psiphon/common/prng"
 	"github.com/pion/dtls/v3/pkg/protocol/handshake"
-	"github.com/theodorsm/covert-dtls/pkg/utils"
+	"github.com/Psiphon-Labs/covert-dtls/pkg/utils"
 )
 
 // [Psiphon] RandomizedMessageServerHello provides a ServerHello hook that
