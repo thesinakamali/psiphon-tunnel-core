@@ -743,6 +743,7 @@ func init() {
 		{119, "inproxy_webrtc_remote_ice_candidate_type", nil},
 		{120, "inproxy_webrtc_remote_ice_candidate_is_IPv6", intConverter},
 		{121, "inproxy_webrtc_remote_ice_candidate_port", intConverter},
+		{175, "inproxy_webrtc_dtls_fingerprint", nil},
 
 		// Specs: server.handshakeRequestParams
 
@@ -847,7 +848,7 @@ func init() {
 		{173, "candidates_moved_to_front", intConverter},
 		{174, "first_fronted_meek_candidate", intConverter},
 
-		// Next key value = 175
+		// Next key value = 176
 	}
 
 	for _, spec := range packedAPIParameterSpecs {
