@@ -1,8 +1,8 @@
 module github.com/Psiphon-Labs/psiphon-tunnel-core
 
-go 1.24.0
+go 1.26.0
 
-toolchain go1.24.12
+toolchain go1.26.1
 
 // The following replaces are required only when the build tag
 // PSIPHON_ENABLE_REFRACTION_NETWORKING is specified.
@@ -22,12 +22,13 @@ require (
 	github.com/Psiphon-Inc/uds-ipc v1.0.1
 	github.com/Psiphon-Labs/bolt v0.0.0-20200624191537-23cedaef7ad7
 	github.com/Psiphon-Labs/consistent v0.0.0-20240322131436-20aaa4e05737
+	github.com/Psiphon-Labs/covert-dtls v0.0.0-20260423180104-2d3b15cbc8be
 	github.com/Psiphon-Labs/goptlib v0.0.0-20200406165125-c0e32a7a3464
-	github.com/Psiphon-Labs/pion-ice/v4 v4.0.0-20260421192847-03e3143eac28
-	github.com/Psiphon-Labs/pion-webrtc/v4 v4.0.0-20260421203412-16b9388e71ce
-	github.com/Psiphon-Labs/psiphon-tls v0.0.0-20250318183125-2a2fae2db378
+	github.com/Psiphon-Labs/pion-ice/v4 v4.0.0-20260423180031-37d6e92d021f
+	github.com/Psiphon-Labs/pion-webrtc/v4 v4.0.0-20260423180049-7ff453f9681a
+	github.com/Psiphon-Labs/psiphon-tls v0.0.0-20260423192305-a8d2d1375668
 	github.com/Psiphon-Labs/quic-go v0.0.0-20250527153145-79fe45fb83b1
-	github.com/Psiphon-Labs/utls v0.0.0-20260129182755-24497d415a8d
+	github.com/Psiphon-Labs/utls v1.1.1-0.20260423193914-69eb96d02588
 	github.com/armon/go-proxyproto v0.0.0-20180202201750-5b7edb60ff5f
 	github.com/axiomhq/hyperloglog v0.2.6
 	github.com/bifurcation/mint v0.0.0-20180306135233-198357931e61
@@ -69,13 +70,12 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8
 	github.com/tailscale/netlink v1.1.1-0.20211101221916-cabfb018fe85
-	github.com/Psiphon-Labs/covert-dtls v0.0.0-20260421192706-c40ece563ae6
 	github.com/wader/filtertransport v0.0.0-20200316221534-bdd9e61eee78
 	github.com/wlynxg/anet v0.0.5
 	golang.org/x/crypto v0.48.0
 	golang.org/x/net v0.50.0
 	golang.org/x/sync v0.19.0
-	golang.org/x/sys v0.41.0
+	golang.org/x/sys v0.42.0
 	golang.org/x/term v0.40.0
 	golang.org/x/time v0.10.0
 	golang.zx2c4.com/wireguard v0.0.0-20230325221338-052af4a8072b
@@ -92,7 +92,6 @@ require (
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/coreos/go-iptables v0.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dblohm7/wingoes v0.0.0-20230929194252-e994401fc077 // indirect
